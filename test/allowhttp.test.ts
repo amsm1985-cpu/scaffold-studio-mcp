@@ -9,6 +9,7 @@ import {
   NETWORKS,
   allowHttpForNetwork,
   assertMainnetRpcIsSecure,
+  getNetwork,
 } from "../src/registry/networks.ts";
 import type { Network } from "../src/core/types.ts";
 
@@ -49,5 +50,24 @@ describe("assertMainnetRpcIsSecure", () => {
     assert.doesNotThrow(() =>
       assertMainnetRpcIsSecure("local", NETWORKS.local.rpcUrl),
     );
+  });
+});
+
+describe("getNetwork validation (#67)", () => {
+  it("throws explicit error text for unknown network values", () => {
+    assert.throws(
+      () => getNetwork("bogus" as any),
+      /Invalid STELLAR_NETWORK: bogus\. Expected one of local, testnet, mainnet\./
+    );
+    assert.throws(
+      () => getNetwork("Testnet" as any),
+      /Invalid STELLAR_NETWORK: Testnet\. Expected one of local, testnet, mainnet\./
+    );
+  });
+
+  it("returns correct configuration for all three supported networks", () => {
+    assert.equal(getNetwork("local").name, "local");
+    assert.equal(getNetwork("testnet").name, "testnet");
+    assert.equal(getNetwork("mainnet").name, "mainnet");
   });
 });

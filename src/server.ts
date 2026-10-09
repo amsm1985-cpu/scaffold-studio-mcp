@@ -14,7 +14,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { Keypair, rpc } from '@stellar/stellar-sdk';
 import { StellarClient } from './core/WalletClientBase.js';
-import { getNetwork, DEFAULT_NETWORK, allowHttpForNetwork, assertMainnetRpcIsSecure } from './registry/networks.js';
+import { getNetwork, DEFAULT_NETWORK, NETWORKS, allowHttpForNetwork, assertMainnetRpcIsSecure } from './registry/networks.js';
 import type { Network, StellarContext } from './core/types.js';
 import { TokenPlugin } from './plugins/token/token.plugin.js';
 import { NFTPlugin } from './plugins/nft/nft.plugin.js';
@@ -28,6 +28,7 @@ import { UtilitiesPlugin } from './plugins/utilities/utilities.plugin.js';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { createCallToolHandler } from './core/call-tool-handler.js';
 import dotenv from 'dotenv';
+import { serializeBigInt } from './utils/serialization.js';
 
 // Load environment variables silently (suppress verbose output for MCP stdio communication)
 const originalConsoleLog = console.log;
@@ -44,7 +45,14 @@ console.error = originalConsoleError;
  */
 function getEnvConfig() {
   const secretKey = process.env.STELLAR_SECRET_KEY;
-  const network = (process.env.STELLAR_NETWORK || DEFAULT_NETWORK) as Network;
+  const rawNetwork = process.env.STELLAR_NETWORK || DEFAULT_NETWORK;
+
+  if (!(rawNetwork in NETWORKS)) {
+    throw new Error(
+      `Invalid STELLAR_NETWORK: ${rawNetwork}. Expected one of local, testnet, mainnet.`
+    );
+  }
+  const network = rawNetwork as Network;
 
   if (!secretKey) {
     throw new Error(
