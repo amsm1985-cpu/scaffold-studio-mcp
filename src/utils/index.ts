@@ -43,7 +43,6 @@ export {
   buildGovernanceConfig,
   buildCappedTokenConfig,
   buildSimpleTokenConfig,
-  buildEnumerableNFTConfig,
   buildMerkleVotingConfig,
   formatTokenAmount,
   parseTokenAmount,
@@ -71,3 +70,6 @@ export {
   serializeBigInt,
   bigIntReplacer,
 } from './serialization.js';
+
+// Error handling utilities
+export { withToolError } from "./errors.js";
