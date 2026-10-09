@@ -57,7 +57,13 @@ export function assertMainnetRpcIsSecure(network: Network, rpcUrl: string): void
  * Get network configuration by name
  */
 export function getNetwork(network: Network): NetworkConfig {
-  return NETWORKS[network];
+  const config = NETWORKS[network];
+  if (!config) {
+    throw new Error(
+      `Invalid STELLAR_NETWORK: ${network}. Expected one of local, testnet, mainnet.`
+    );
+  }
+  return config;
 }
 
 /**
